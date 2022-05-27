@@ -1,4 +1,4 @@
-package login
+package process
 
 import (
 	"communicationProject/client/utils"
@@ -10,7 +10,10 @@ import (
 	"time"
 )
 
-func Login(userId int, userPwd string) (err error) {
+type UserProcess struct {
+}
+
+func (this *UserProcess) Login(userId int, userPwd string) (err error) {
 	//制定协议
 	//连接到服务器
 	conn, err := net.Dial("tcp", "192.168.31.101:8888")
@@ -59,10 +62,13 @@ func Login(userId int, userPwd string) (err error) {
 	if err != nil {
 		fmt.Println("con.Write(data)失败")
 	}
-	time.Sleep(20 * time.Second)
-	fmt.Println("休眠20秒")
+	time.Sleep(5 * time.Second)
+	fmt.Println("休眠5秒")
 	//这里处理服务端返回的消息
-	mes, err = utils.ReadPkg(conn)
+	transfer := &utils.Transfer{
+		Conn: conn,
+	}
+	mes, err = transfer.ReadPkg()
 	if err != nil {
 		fmt.Println("ReadPkg错误", err)
 		return
@@ -72,6 +78,13 @@ func Login(userId int, userPwd string) (err error) {
 	err = json.Unmarshal([]byte(mes.Data), &loginResMes)
 	if loginResMes.Code == 200 {
 		fmt.Println("登陆成功")
+		//起一个协程为了保持与服务器端端通讯
+		//如果服务器有数据推送可以接受并显示在客户端的终端
+		go ServerProcessMes(conn)
+		//1.显示登陆成功的菜单
+		for true {
+			ShowMenu()
+		}
 	} else if loginResMes.Code == 500 {
 		fmt.Println(loginResMes.Error)
 	}
