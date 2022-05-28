@@ -12,6 +12,14 @@ type UserDao struct {
 	pool *redis.Pool
 }
 
+//使用工厂模式创建一个userDao实例
+func NewUserDao(pool *redis.Pool) (userDao *UserDao) {
+	userDao = &UserDao{
+		pool: userDao.pool,
+	}
+	return
+}
+
 //第一个方法，根据用户id返回一个User实例+err
 func (this *UserDao) getUserById(conn redis.Conn, id int) (user *User, err error) {
 	//通过给定的id来redis查询用户
@@ -30,4 +38,25 @@ func (this *UserDao) getUserById(conn redis.Conn, id int) (user *User, err error
 		return
 	}
 	return
+}
+
+//完成登录校验
+//Login 完成对用户的校验
+//如果用户的id和pwd都正确，则返回一个user实例
+//如果id或pwd有错误，则返回对应信息
+func (this *UserDao) Login(userId int, userPwd string) (user *User, err error) {
+	//先从连接池中取出一个链接
+	conn := this.pool.Get()
+	defer conn.Close()
+	user, err = this.getUserById(conn, userId)
+	if err != nil {
+		return
+	}
+	//这个时候证明用户已经获取到了
+	if user.UserPwd != userPwd {
+		err = ERROR_USER_PWD
+		return
+	}
+	return
+
 }

@@ -1,12 +1,14 @@
 package main
 
 import (
+	"communicationProject/server/model"
 	"fmt"
 	"io"
 	"net"
 )
 
 func main() {
+	model.InitPool("localhost", 8, 0, 10)
 	lis, err := net.Listen("tcp", "0.0.0.0:8888")
 	if err != nil {
 		fmt.Println("监听错误")
