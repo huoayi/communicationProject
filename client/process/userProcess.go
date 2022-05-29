@@ -16,7 +16,7 @@ type UserProcess struct {
 func (this *UserProcess) Login(userId int, userPwd string) (err error) {
 	//制定协议
 	//连接到服务器
-	conn, err := net.Dial("tcp", "192.168.31.101:8888")
+	conn, err := net.Dial("tcp", "192.168.1.102:8888")
 	if err != nil {
 		fmt.Println("连接失败\t", err)
 		return

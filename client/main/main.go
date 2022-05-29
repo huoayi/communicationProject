@@ -16,7 +16,7 @@ func main() {
 	fmt.Println("\t\t2.注册")
 	fmt.Println("\t\t3.退出")
 	fmt.Println("\t\t请选择1～3")
-	fmt.Scanf("%d", &sel)
+	fmt.Scanf("%d\n", &sel)
 	for true {
 		switch sel {
 		case 1:

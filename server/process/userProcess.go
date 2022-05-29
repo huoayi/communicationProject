@@ -2,6 +2,7 @@ package process
 
 import (
 	common "communicationProject/common/message"
+	"communicationProject/server/model"
 	"communicationProject/server/utils"
 	"encoding/json"
 	"fmt"
@@ -26,15 +27,17 @@ func (this *UserProcessor) ServerProcessLogin(mes *common.Message) (err error) {
 	resMes.Type = common.LoginResMesType
 	//再声明一个LoginResMes,并完成赋值
 	var LoginResMes common.LoginResMes
+	//需要去redis数据库进行校验
+	//使用model.MyUserDao到redis进行验证
+	user, err := model.MyUserDao.Login(loginMes.UserId, loginMes.UserPwd)
 
-	//如果用户id = 100 密码 = 123456认为合法，否则非法
-	if loginMes.UserId == 100 && loginMes.UserPwd == "123456" {
-		//合法
-		LoginResMes.Code = 200
-	} else {
-		//非法
+	if err != nil {
 		LoginResMes.Code = 500
-		LoginResMes.Error = "表示该用户不存在"
+		LoginResMes.Error = "该用户不存在，请注册再使用"
+		//这里测试成功后返回具体错误信息
+	} else {
+		LoginResMes.Code = 200
+		fmt.Println(user.UserName, "登陆成功")
 	}
 
 	//将loginResMes序列化

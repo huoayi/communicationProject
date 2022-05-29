@@ -8,7 +8,8 @@ import (
 )
 
 func main() {
-	model.InitPool("localhost", 8, 0, 10)
+	model.InitPool("localhost:6379", 8, 0, 10)
+	initUserDao()
 	lis, err := net.Listen("tcp", "0.0.0.0:8888")
 	if err != nil {
 		fmt.Println("监听错误")
@@ -40,4 +41,12 @@ func Process(conn net.Conn) {
 		fmt.Println("process出了点小问题，客户端与服务器通讯协程错误", err)
 		return
 	}
+}
+
+//这里编写一个函数完成对userDao的初始化任务
+func initUserDao() {
+	//这里的model.Pool本身是一个全局变量
+	//这里需要注意一个初始化顺序问题
+	//initPool，在initUserDao
+	model.MyUserDao = model.NewUserDao(model.Pool)
 }
