@@ -1,5 +1,7 @@
 package common
 
+import "communicationProject/server/model"
+
 const (
 	LoginMesType    = "LoginMes"
 	LoginResMesType = "LoginResMes"
@@ -22,5 +24,9 @@ type LoginResMes struct {
 	Error string //返回错误信息
 }
 type RegisterMes struct {
-	//...
+	User model.User `json:"user"` //类型就是User结构体
+}
+type RegistResMes struct {
+	Code  int    `json:"code"`
+	Error string `json:"error"`
 }

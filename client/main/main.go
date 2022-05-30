@@ -8,6 +8,7 @@ import (
 
 var userId int
 var userPwd string
+var userName string
 
 func main() {
 	var sel int //选项
@@ -32,6 +33,15 @@ func main() {
 			up.Login(userId, userPwd)
 		case 2:
 			fmt.Println("注册中")
+			fmt.Println("请输入用户id:")
+			fmt.Scanf("%d\n", &userId)
+			fmt.Println("请输入用户密码:")
+			fmt.Scanf("%s\n", &userPwd)
+			fmt.Println("请输入用户昵称:")
+			fmt.Scanf("%s\n", &userName)
+			//调用UserProcess实例，完成注册请求
+			up := process.UserProcess{}
+			up.Register(userId, userPwd, userName)
 		case 3:
 			fmt.Println("退出系统")
 			os.Exit(0)

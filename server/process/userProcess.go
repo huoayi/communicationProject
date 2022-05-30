@@ -32,8 +32,17 @@ func (this *UserProcessor) ServerProcessLogin(mes *common.Message) (err error) {
 	user, err := model.MyUserDao.Login(loginMes.UserId, loginMes.UserPwd)
 
 	if err != nil {
-		LoginResMes.Code = 500
-		LoginResMes.Error = "该用户不存在，请注册再使用"
+		if err == model.ERROR_USER_NOTEXISTS {
+			LoginResMes.Code = 500
+			LoginResMes.Error = err.Error()
+		} else if err == model.ERROR_USER_PWD {
+			LoginResMes.Code = 300
+			LoginResMes.Error = err.Error()
+		} else {
+			LoginResMes.Code = 404
+			LoginResMes.Error = "服务器内部错误"
+		}
+
 		//这里测试成功后返回具体错误信息
 	} else {
 		LoginResMes.Code = 200
