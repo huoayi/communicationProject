@@ -70,3 +70,25 @@ func (this *UserDao) Login(userId int, userPwd string) (user *User, err error) {
 	return
 
 }
+
+func (this *UserDao) Register(user *User) (err error) {
+	conn := this.pool.Get()
+	defer conn.Close()
+	_, err = this.getUserById(conn, user.UserId)
+	if err == nil {
+		err = ERROR_USER_EXISTS
+		return
+	}
+	//这是说明id在redis中没有，则可以完成注册
+	data, err := json.Marshal(user) //序列化
+	if err != nil {
+		return err
+	}
+	//入库操作
+	_, err = conn.Do("HSet", "users", user.UserId, string(data))
+	if err != nil {
+		fmt.Println("保存注册用户错误", err)
+		return err
+	}
+	return err
+}
