@@ -1,6 +1,7 @@
 package model
 
 import (
+	common "communicationProject/common/message"
 	"encoding/json"
 	"fmt"
 	"github.com/garyburd/redigo/redis"
@@ -71,7 +72,7 @@ func (this *UserDao) Login(userId int, userPwd string) (user *User, err error) {
 
 }
 
-func (this *UserDao) Register(user *User) (err error) {
+func (this *UserDao) Register(user *common.User) (err error) {
 	conn := this.pool.Get()
 	defer conn.Close()
 	_, err = this.getUserById(conn, user.UserId)

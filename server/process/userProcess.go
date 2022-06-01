@@ -75,3 +75,42 @@ func (this *UserProcessor) ServerProcessLogin(mes *common.Message) (err error) {
 	}
 	return
 }
+func (this *UserProcessor) ServerProcessRegister(mes *common.Message) (err error) {
+	var registerMes common.RegisterMes
+	err = json.Unmarshal([]byte(mes.Data), &registerMes)
+	if err != nil {
+		fmt.Println("json反序列化失败", err)
+		return err
+	}
+
+	var resMes common.Message
+	resMes.Type = common.RegisterMeType
+
+	var registerResMes common.RegistResMes
+	err = model.MyUserDao.Register(&registerMes.User)
+	if err != nil {
+		if err == model.ERROR_USER_EXISTS {
+			registerResMes.Code = 505
+			registerResMes.Error = model.ERROR_USER_EXISTS.Error()
+		} else {
+			registerResMes.Code = 506
+			registerResMes.Error = "注册发生未知错误"
+		}
+	}
+	data, err := json.Marshal(registerResMes)
+	if err != nil {
+		fmt.Println("序列化失败", err)
+		return err
+	}
+	resMes.Data = string(data)
+	data, err = json.Marshal(resMes)
+	if err != nil {
+		fmt.Println("序列化失败", err)
+		return err
+	}
+	tf := &utils.Transfer{
+		Conn: this.Conn,
+	}
+	err = tf.WritePkg(data)
+	return
+}

@@ -96,6 +96,7 @@ func (this *UserProcess) Login(userId int, userPwd string) (err error) {
 func (this *UserProcess) Register(userId int, userPwd string, userName string) (err error) {
 	//制定协议
 	//连接到服务器
+
 	conn, err := net.Dial("tcp", "192.168.1.102:8888")
 	if err != nil {
 		fmt.Println("连接失败\t", err)
@@ -110,7 +111,6 @@ func (this *UserProcess) Register(userId int, userPwd string, userName string) (
 	registerMes.User.UserId = userId
 	registerMes.User.UserPwd = userPwd
 	registerMes.User.UserName = userName
-
 	//将registerMes序列化
 	data, err := json.Marshal(registerMes)
 	if err != nil {
@@ -165,7 +165,7 @@ func (this *UserProcess) Register(userId int, userPwd string, userName string) (
 		fmt.Println("注册成功,请重新登录")
 		os.Exit(0)
 	} else {
-		fmt.Println(registerResMes.Error)
+		fmt.Println("+++++++++++++++++++++++++++++++\n", registerResMes.Error)
 		os.Exit(0)
 	}
 
