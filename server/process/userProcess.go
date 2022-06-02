@@ -11,6 +11,8 @@ import (
 
 type UserProcessor struct {
 	Conn net.Conn
+	//增加一个字段表示该Conn为该用户
+	UserId int
 }
 
 func (this *UserProcessor) ServerProcessLogin(mes *common.Message) (err error) {
