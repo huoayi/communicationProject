@@ -38,17 +38,28 @@ func (this *UserProcessor) ServerProcessLogin(mes *common.Message) (err error) {
 			LoginResMes.Code = 500
 			LoginResMes.Error = err.Error()
 		} else if err == model.ERROR_USER_PWD {
-			LoginResMes.Code = 300
+			LoginResMes.Code = 403
 			LoginResMes.Error = err.Error()
 		} else {
-			LoginResMes.Code = 404
+			LoginResMes.Code = 505
 			LoginResMes.Error = "服务器内部错误"
 		}
 
 		//这里测试成功后返回具体错误信息
 	} else {
 		LoginResMes.Code = 200
+		//因为用户已经登陆成功，我们就把登陆成功的用户放入到userMgr中
+		//将登陆成功的用户id赋给this
+		this.UserId = loginMes.UserId
+		userMgr.AddOnlineUser(this)
+		//将当前在线用户的id放入到loginResMes.UsersId
+		//便利userMgr.onlineUsers
+		for id, _ := range userMgr.onlineUsers {
+			LoginResMes.UserIds = append(LoginResMes.UserIds, id)
+		}
+
 		fmt.Println(user.UserName, "登陆成功")
+
 	}
 
 	//将loginResMes序列化
@@ -99,6 +110,7 @@ func (this *UserProcessor) ServerProcessRegister(mes *common.Message) (err error
 			registerResMes.Error = "注册发生未知错误"
 		}
 	}
+	registerResMes.Code = 200
 	data, err := json.Marshal(registerResMes)
 	if err != nil {
 		fmt.Println("序列化失败", err)

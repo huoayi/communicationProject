@@ -80,6 +80,14 @@ func (this *UserProcess) Login(userId int, userPwd string) (err error) {
 	err = json.Unmarshal([]byte(mes.Data), &loginResMes)
 	if loginResMes.Code == 200 {
 		fmt.Println("登陆成功")
+
+		//现在可以显示一下在线用户的列表
+		//遍历loginResMes.UserId
+		fmt.Println("当前用户列表如下:")
+		for _, v := range loginResMes.UserIds {
+			fmt.Println("用户id:\t", v)
+		}
+		fmt.Println("\n\n")
 		//起一个协程为了保持与服务器端端通讯
 		//如果服务器有数据推送可以接受并显示在客户端的终端
 		go ServerProcessMes(conn)
@@ -163,8 +171,10 @@ func (this *UserProcess) Register(userId int, userPwd string, userName string) (
 	err = json.Unmarshal([]byte(mes.Data), &registerResMes)
 	if registerResMes.Code == 200 {
 		fmt.Println("注册成功,请重新登录")
+		os.Exit(0)
 	} else {
-		fmt.Println("+++++++++++++++++++++++++++++++\n", registerResMes.Error)
+		fmt.Println("+++++++++++++++++++++++++++++++\n", registerResMes.Code, registerResMes.Error)
+		fmt.Println("注册失败")
 		os.Exit(0)
 	}
 

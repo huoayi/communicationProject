@@ -18,8 +18,9 @@ type LoginMes struct {
 	UserName string `json:"userName"` //用户名
 }
 type LoginResMes struct {
-	Code  int    //状态码
-	Error string //返回错误信息
+	Code    int    //状态码
+	UserIds []int  //增加字段，保存用户id的切片
+	Error   string //返回错误信息
 }
 type RegisterMes struct {
 	User User `json:"user"` //类型就是User结构体

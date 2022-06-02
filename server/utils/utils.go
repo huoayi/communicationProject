@@ -51,13 +51,13 @@ func (this *Transfer) WritePkg(data []byte) (err error) {
 	binary.BigEndian.PutUint32(this.Buf[0:4], pkgLen)
 	n, err := this.Conn.Write(this.Buf[:4])
 	if n != 4 || err != nil {
-		fmt.Println("conn.Write fail")
+		fmt.Println("conn.Write fail1")
 		return
 	}
 	//发送data本身
 	n, err = this.Conn.Write(data)
 	if n != int(pkgLen) || err != nil {
-		fmt.Println("conn.Write fail")
+		fmt.Println("conn.Write fail2")
 		return
 	}
 	return
