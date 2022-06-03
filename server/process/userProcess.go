@@ -52,6 +52,7 @@ func (this *UserProcessor) ServerProcessLogin(mes *common.Message) (err error) {
 		//将登陆成功的用户id赋给this
 		this.UserId = loginMes.UserId
 		userMgr.AddOnlineUser(this)
+		this.NotifyOthersOnlineUser(loginMes.UserId)
 		//将当前在线用户的id放入到loginResMes.UsersId
 		//便利userMgr.onlineUsers
 		for id, _ := range userMgr.onlineUsers {
@@ -59,7 +60,6 @@ func (this *UserProcessor) ServerProcessLogin(mes *common.Message) (err error) {
 		}
 
 		fmt.Println(user.UserName, "登陆成功")
-
 	}
 
 	//将loginResMes序列化
@@ -127,4 +127,47 @@ func (this *UserProcessor) ServerProcessRegister(mes *common.Message) (err error
 	}
 	err = tf.WritePkg(data)
 	return
+}
+
+//通知所有在线用户的方法
+func (this *UserProcessor) NotifyOthersOnlineUser(userId int) {
+	//遍历onlineUsers,然后一个一个的发送
+	for id, up := range userMgr.onlineUsers {
+		if id == userId {
+			continue
+		}
+		//开始通知
+		up.NotifyMeToOtherOnline(userId)
+	}
+}
+func (this *UserProcessor) NotifyMeToOtherOnline(userId int) {
+	//组装Notify消息
+	var message common.Message
+	message.Type = common.NotifyUserStatusMesType
+	var notifyUserStatusMes common.NotifyUserStatusMes
+	notifyUserStatusMes.UserId = userId
+	notifyUserStatusMes.Status = common.UserOnline
+	//将notifyUserStatusMes序列化
+	data, err := json.Marshal(notifyUserStatusMes)
+	if err != nil {
+		fmt.Println("序列化错误,", err)
+		return
+	}
+	//将序列化后的notifyUserStatusMes赋给message.Data
+	message.Data = string(data)
+
+	//对message再次序列化
+	data, err = json.Marshal(message.Data)
+	if err != nil {
+		fmt.Println("序列化错误,", err)
+		return
+	}
+	tf := &utils.Transfer{
+		Conn: this.Conn,
+	}
+	err = tf.WritePkg(data)
+	if err != nil {
+		fmt.Println("writerPkg出错")
+		return
+	}
 }

@@ -17,7 +17,7 @@ type UserProcess struct {
 func (this *UserProcess) Login(userId int, userPwd string) (err error) {
 	//制定协议
 	//连接到服务器
-	conn, err := net.Dial("tcp", "192.168.1.102:8888")
+	conn, err := net.Dial("tcp", "192.168.31.101:8888")
 	if err != nil {
 		fmt.Println("连接失败\t", err)
 		return
@@ -80,12 +80,24 @@ func (this *UserProcess) Login(userId int, userPwd string) (err error) {
 	err = json.Unmarshal([]byte(mes.Data), &loginResMes)
 	if loginResMes.Code == 200 {
 		fmt.Println("登陆成功")
-
+		curUser.Conn = conn
+		curUser.UserId = userId
+		curUser.UserStatus = common.UserOnline
 		//现在可以显示一下在线用户的列表
 		//遍历loginResMes.UserId
 		fmt.Println("当前用户列表如下:")
 		for _, v := range loginResMes.UserIds {
+			if v == userId {
+				continue
+			}
 			fmt.Println("用户id:\t", v)
+			//完成客户端的OnlineUsers的初始化
+			//创建user
+			user := &common.User{
+				UserId:     userId,
+				UserStatus: common.UserOnline,
+			}
+			onlineUsers[v] = user
 		}
 		fmt.Println("\n\n")
 		//起一个协程为了保持与服务器端端通讯
@@ -105,7 +117,7 @@ func (this *UserProcess) Register(userId int, userPwd string, userName string) (
 	//制定协议
 	//连接到服务器
 
-	conn, err := net.Dial("tcp", "192.168.1.102:8888")
+	conn, err := net.Dial("tcp", "192.168.31.101:8888")
 	if err != nil {
 		fmt.Println("连接失败\t", err)
 		return
@@ -177,6 +189,5 @@ func (this *UserProcess) Register(userId int, userPwd string, userName string) (
 		fmt.Println("注册失败")
 		os.Exit(0)
 	}
-
 	return
 }
