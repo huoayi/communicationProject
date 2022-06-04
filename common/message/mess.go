@@ -1,9 +1,19 @@
 package message
 
 const (
-	LoginMesType    = "LoginMes"
-	LoginResMesType = "LoginResMes"
-	RegisterMeType  = "RegisterMes"
+	LoginMesType            = "LoginMes"
+	LoginResMesType         = "LoginResMes"
+	RegisterMeType          = "RegisterMes"
+	RegisterResMesType      = "RegisterResMes"
+	NotifyUserStatusMesType = "NotifyUserStatusMes"
+	SmsMesType              = "SmsMes"
+)
+
+//这里定义登陆状态常量
+const (
+	UserOnline = iota
+	UserOffice
+	UserBusys
 )
 
 type Message struct {
@@ -28,4 +38,16 @@ type RegisterMes struct {
 type RegistResMes struct {
 	Code  int    `json:"code"`
 	Error string `json:"error"`
+}
+
+//为了配合服务器端推送用户变化状态的信息
+type NotifyUserStatusMes struct {
+	UserId int `json:"userId"` //用户ID
+	Status int `json:"status"` //用户状态
+}
+
+//增加一个SmsMes
+type SmsMes struct {
+	Content string `json:"content"`
+	User           //匿名结构体
 }
